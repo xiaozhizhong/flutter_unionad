@@ -43,6 +43,8 @@ const String rewardName = "rewardName";
 
 ///全屏视频广告广告
 const String fullVideoType = "fullVideoType";
+//广告加载完成
+const String onAdLoaded = "onLoaded";
 //广告显示
 const String onAdShow = "onAdShow";
 //广告返回
@@ -71,4 +73,3 @@ const int restricted = 1;
 const int denied = 2;
 //同意
 const int authorized = 3;
-

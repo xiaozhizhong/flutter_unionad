@@ -22,7 +22,7 @@ import io.flutter.plugin.platform.PlatformView
  * @CreateDate: 2020/8/19 10:34
  */
 internal class SplashAdView(var context: Context, var messenger: BinaryMessenger?, id: Int, params: Map<String?, Any?>) : PlatformView {
-    private val TAG = "AdBannerView"
+    private val TAG = "AdSPLASHView"
     private var mExpressContainer: FrameLayout? = null
     var mTTAdNative: TTAdNative
 
@@ -37,6 +37,7 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
     private val AD_TIME_OUT = 3000
 
     private var channel : MethodChannel?
+    private var splashView: View?
 
     init {
         mCodeId = params["androidCodeId"] as String?
@@ -105,19 +106,8 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
                     return
                 }
                 //获取SplashView
-                val view = ad.splashView
-                if (view != null && mExpressContainer != null) {
-                    //把SplashView 添加到ViewGroup中,注意开屏广告view：width >=70%屏幕宽；height >=50%屏幕高
-                    mExpressContainer!!.removeAllViews()
-//                    val mExpressContainerParams: FrameLayout.LayoutParams = FrameLayout.LayoutParams(UIUtils.dip2px(context, expressViewWidth).toInt(),
-//                            UIUtils.dip2px(context, expressViewHeight).toInt())
-//                    mExpressContainer!!.layoutParams = mExpressContainerParams
-                    mExpressContainer!!.addView(view)
-                    //设置不开启开屏广告倒计时功能以及不显示跳过按钮,如果这么设置，您需要自定义倒计时逻辑
-                    //ad.setNotAllowSdkCountdown();
-                } else {
+                splashView = ad.splashView
 
-                }
 
                 //设置SplashView的交互监听器
                 ad.setSplashInteractionListener(object : TTSplashAd.AdInteractionListener {
@@ -171,6 +161,21 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
 //                }
             }
         }, AD_TIME_OUT)
+    }
+
+    private fun showSplashView(){
+        if (splashView != null && mExpressContainer != null) {
+            //把SplashView 添加到ViewGroup中,注意开屏广告view：width >=70%屏幕宽；height >=50%屏幕高
+            mExpressContainer!!.removeAllViews()
+//                    val mExpressContainerParams: FrameLayout.LayoutParams = FrameLayout.LayoutParams(UIUtils.dip2px(context, expressViewWidth).toInt(),
+//                            UIUtils.dip2px(context, expressViewHeight).toInt())
+//                    mExpressContainer!!.layoutParams = mExpressContainerParams
+            mExpressContainer!!.addView(splashView)
+            //设置不开启开屏广告倒计时功能以及不显示跳过按钮,如果这么设置，您需要自定义倒计时逻辑
+            //ad.setNotAllowSdkCountdown();
+        } else {
+            channel?.invokeMethod("onFail","广告显示失败")
+        }
     }
 
     override fun dispose() {

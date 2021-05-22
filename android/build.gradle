@@ -18,9 +18,9 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
-        flatDir {
-            dirs project(':flutter_unionad').file('libs')
-        }
+//        flatDir {
+//            dirs project(':flutter_unionad').file('libs')
+//        }
     }
 }
 

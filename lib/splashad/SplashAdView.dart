@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_unionad/flutter_unionad.dart';
 
+import '../flutter_unionad_code.dart';
+
 class SplashAdView extends StatefulWidget {
   final bool mIsExpress;
   final String androidCodeId;
@@ -94,11 +96,11 @@ class _SplashAdViewState extends State<SplashAdView> {
   //监听原生view传值
   Future<dynamic> _platformCallHandler(MethodCall call) async {
     switch (call.method) {
+      //广告加载完成
+      case onAdLoaded:
+        break;
       //显示广告
       case onShow:
-        if (widget.callBack != null) {
-          widget.callBack(FlutterUnionadState(call.method, call.arguments));
-        }
         break;
       //广告加载失败
       case onFail:
@@ -107,27 +109,15 @@ class _SplashAdViewState extends State<SplashAdView> {
             _isShowAd = false;
           });
         }
-        if (widget.callBack != null) {
-          widget.callBack(FlutterUnionadState(call.method, call.arguments));
-        }
         break;
       //开屏广告点击
       case onAplashClick:
-        if (widget.callBack != null) {
-          widget.callBack(FlutterUnionadState(call.method, call.arguments));
-        }
         break;
       //开屏广告跳过
       case onAplashSkip:
-        if (widget.callBack != null) {
-          widget.callBack(FlutterUnionadState(call.method, call.arguments));
-        }
         break;
       //开屏广告倒计时结束
       case onAplashFinish:
-        if (widget.callBack != null) {
-          widget.callBack(FlutterUnionadState(call.method, call.arguments));
-        }
         break;
       //开屏广告加载超时
       case onAplashTimeout:
@@ -136,10 +126,11 @@ class _SplashAdViewState extends State<SplashAdView> {
             _isShowAd = false;
           });
         }
-        if (widget.callBack != null) {
-          widget.callBack(FlutterUnionadState(call.method, call.arguments));
-        }
         break;
+    }
+    if (widget.callBack != null) {
+      widget.callBack(
+          _channel, FlutterUnionadState(call.method, call.arguments));
     }
   }
 }
