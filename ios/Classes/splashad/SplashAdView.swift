@@ -167,6 +167,8 @@ extension SplashAdView : BUNativeExpressSplashViewDelegate{
 
     public func nativeExpressSplashViewDidClick(_ splashAdView: BUNativeExpressSplashView) {
         LogUtil.logInstance.printLog(message: "广告点击")
+        splashAdView.remove()
+        self.disposeView()
         self.channel?.invokeMethod("onAplashClick", arguments: "开屏广告点击")
     }
 
