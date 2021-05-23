@@ -14,6 +14,8 @@ import com.gstory.flutter_unionad.FlutterunionadViewConfig
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
+import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.MethodCall
 
 
 /**
@@ -23,7 +25,7 @@ import io.flutter.plugin.platform.PlatformView
  */
 internal class SplashAdView(var context: Context, var messenger: BinaryMessenger?, id: Int, params: Map<String?, Any?>) : PlatformView {
     private val TAG = "AdSPLASHView"
-    private var mExpressContainer: FrameLayout? = null
+    private lateinit var mExpressContainer: FrameLayout
     var mTTAdNative: TTAdNative
 
     //广告所需参数
@@ -33,11 +35,13 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
     var expressViewHeight: Float
     var mIsExpress: Boolean? = true
 
+    private val _METHOD_SHOW_AD = "showAd"
+
     //开屏广告加载超时时间,建议大于3000,这里为了冷启动第一次加载到广告并且展示,示例设置了3000ms
     private val AD_TIME_OUT = 3000
 
     private var channel : MethodChannel?
-    private var splashView: View?
+    private var splashView: View? = null
 
     init {
         mCodeId = params["androidCodeId"] as String?
@@ -59,11 +63,20 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
         val mTTAdManager = TTAdManagerHolder.get()
         mTTAdNative = mTTAdManager.createAdNative(context.applicationContext)
         channel = MethodChannel(messenger, FlutterunionadViewConfig.splashAdView+"_"+id)
+        channel?.setMethodCallHandler(::onMethodCall)
         loadSplashAd()
     }
 
     override fun getView(): View {
         return mExpressContainer!!
+    }
+
+    private fun onMethodCall(call: MethodCall, result: Result) {
+        when (call.method) {
+            _METHOD_SHOW_AD -> showSplashView()
+            else -> result.notImplemented()
+        }
+        result.success(true)
     }
 
     /**
@@ -90,30 +103,33 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
             override fun onError(code: Int, message: String) {
                 Log.e(TAG, message)
                 channel?.invokeMethod("onFail",message)
+                //removeSplash()
             }
 
             @MainThread
             override fun onTimeout() {
                 Log.e(TAG, "开屏广告加载超时")
                 channel?.invokeMethod("onAplashTimeout","")
+                //removeSplash()
             }
 
             @MainThread
             override fun onSplashAdLoad(ad: TTSplashAd) {
                 Log.e(TAG, "开屏广告请求成功")
                 if (ad == null) {
-                    channel?.invokeMethod("onFail","拉去广告失败")
+                    channel?.invokeMethod("onFail","拉取广告失败")
                     return
                 }
                 //获取SplashView
                 splashView = ad.splashView
-
+                channel?.invokeMethod("onLoaded","成功拉取广告")
 
                 //设置SplashView的交互监听器
                 ad.setSplashInteractionListener(object : TTSplashAd.AdInteractionListener {
                     override fun onAdClicked(view: View, type: Int) {
                         Log.e(TAG, "onAdClicked开屏广告点击")
                         channel?.invokeMethod("onAplashClick","开屏广告点击")
+                        //removeSplash()
                     }
 
                     override fun onAdShow(view: View, type: Int) {
@@ -124,11 +140,13 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
                     override fun onAdSkip() {
                         Log.e(TAG, "onAdSkip开屏广告跳过")
                         channel?.invokeMethod("onAplashSkip","开屏广告跳过")
+                        //removeSplash()
                     }
 
                     override fun onAdTimeOver() {
                         Log.e(TAG, "onAdTimeOver开屏广告倒计时结束")
                         channel?.invokeMethod("onAplashFinish","开屏广告倒计时结束")
+                        //removeSplash()
                     }
                 })
 //                if (ad.interactionType == TTAdConstant.INTERACTION_TYPE_DOWNLOAD) {
@@ -179,6 +197,14 @@ internal class SplashAdView(var context: Context, var messenger: BinaryMessenger
     }
 
     override fun dispose() {
+        removeSplash()
+        Log.e("----------------------","pangle dispose")
+    }
 
+    private  fun removeSplash(){
+        if (mExpressContainer.childCount > 0) {
+            mExpressContainer.removeAllViews()
+        }
+        splashView = null
     }
 }
