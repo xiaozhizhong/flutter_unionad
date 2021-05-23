@@ -99,6 +99,7 @@ public class SplashAdView : NSObject,FlutterPlatformView{
     private func disposeView() {
         self.removeAllView()
     }
+    
 }
 
 extension SplashAdView : BUSplashAdDelegate{
@@ -151,7 +152,6 @@ extension SplashAdView : BUNativeExpressSplashViewDelegate{
 
     public func nativeExpressSplashViewRenderSuccess(_ splashAdView: BUNativeExpressSplashView) {
         LogUtil.logInstance.printLog(message: "加载成功")
-        self.channel?.invokeMethod("onShow", arguments: "")
     }
 
     public func nativeExpressSplashViewRenderFail(_ splashAdView: BUNativeExpressSplashView, error: Error?) {
@@ -163,6 +163,7 @@ extension SplashAdView : BUNativeExpressSplashViewDelegate{
 
     public func nativeExpressSplashViewWillVisible(_ splashAdView: BUNativeExpressSplashView) {
         LogUtil.logInstance.printLog(message: "显示")
+        self.channel?.invokeMethod("onShow", arguments: "")
     }
 
     public func nativeExpressSplashViewDidClick(_ splashAdView: BUNativeExpressSplashView) {
