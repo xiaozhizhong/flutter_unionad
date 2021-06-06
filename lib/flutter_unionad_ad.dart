@@ -26,6 +26,7 @@ Future<bool> register({
   bool? debug,
   bool? supportMultiProcess,
   List<int>? directDownloadNetworkType,
+  bool? recommendation
 }) async {
   return await _channel.invokeMethod("register", {
     "iosAppId": iosAppId,
@@ -45,7 +46,8 @@ Future<bool> register({
             NETWORK_STATE_3G,
             NETWORK_STATE_4G,
             NETWORK_STATE_WIFI
-          ]
+          ],
+    "recommendation":recommendation ?? true
   });
 }
 

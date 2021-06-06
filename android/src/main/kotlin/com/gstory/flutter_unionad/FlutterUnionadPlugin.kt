@@ -79,13 +79,14 @@ public class FlutterUnionadPlugin : FlutterPlugin, MethodCallHandler, ActivityAw
             var debug = call.argument<Boolean>("debug")
             var supportMultiProcess = call.argument<Boolean>("supportMultiProcess")
             val directDownloadNetworkType = call.argument<List<Int>>("directDownloadNetworkType")!!
+            val recommendation = call.argument<Boolean>("recommendation")
             if (appId == null || appId.trim { it <= ' ' }.isEmpty()) {
                 result.error("500", "appId can't be null", null)
             } else {
                 if (appName == null || appName.trim { it <= ' ' }.isEmpty()) {
                     result.error("600", "appName can't be null", null)
                 } else {
-                    TTAdManagerHolder.init(applicationContext!!, appId, useTextureView!!, appName, allowShowNotify!!, allowShowPageWhenScreenLock!!, debug!!, supportMultiProcess!!, directDownloadNetworkType)
+                    TTAdManagerHolder.init(applicationContext!!, appId, useTextureView!!, appName, allowShowNotify!!, allowShowPageWhenScreenLock!!, debug!!, supportMultiProcess!!, directDownloadNetworkType,recommendation!!)
                     result.success(true)
                 }
             }
